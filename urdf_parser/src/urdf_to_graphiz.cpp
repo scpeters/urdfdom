@@ -35,6 +35,7 @@
 /* Author: Wim Meeussen */
 
 #include "urdf_parser/urdf_parser.h"
+#include "collada_parser/collada_parser.h"
 #include <iostream>
 #include <fstream>
 
@@ -101,7 +102,17 @@ int main(int argc, char** argv)
   }
   xml_file.close();
 
-  boost::shared_ptr<ModelInterface> robot = parseURDF(xml_string);
+  boost::shared_ptr<ModelInterface> robot;
+  if( xml_string.find("<COLLADA") != std::string::npos )
+    {
+      ROS_DEBUG("Parsing robot collada xml string");
+      robot = parseCollada(xml_string);
+    }
+  else
+    {
+      ROS_DEBUG("Parsing robot urdf xml string");
+      robot = parseURDF(xml_string);
+    }
   if (!robot){
     std::cerr << "ERROR: Model Parsing the xml failed" << std::endl;
     return -1;
